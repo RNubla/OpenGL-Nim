@@ -1,0 +1,1 @@
+nim c -d:mingw --out:nimgl_mingw src/nimgl.nim
