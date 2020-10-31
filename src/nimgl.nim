@@ -14,22 +14,48 @@ proc main() =
   glfwWindowHint(GLFWOpenglProfile, GLFW_OPENGL_CORE_PROFILE)
   glfwWindowHint(GLFWResizable, GLFW_FALSE)
 
-  let w: GLFWWindow = glfwCreateWindow(800, 600, "NimGL")
-  if w == nil:
+  let window: GLFWWindow = glfwCreateWindow(1024, 768, "Tutorial 01", nil, nil)
+  if window == nil:
+    write(stdout, "Failed to open GLFW window.")
+    glfwTerminate()
     quit(-1)
 
-  discard w.setKeyCallback(keyProc)
-  w.makeContextCurrent()
+  discard window.setKeyCallback(keyProc)
+  window.makeContextCurrent()
 
   assert glInit()
+  var g_vertex_buffer_data =
+    [ GLfloat(-1.0f), -1.0f, 0.0f,
+              1.0f, -1.0f, 0.0f,
+              0.0f,  1.0f, 0.0f,
+    ]
+  var 
+    vertexBuff:GLuint
+    vbo:GLuint
+    shaderProgram : GLuint
+    vertShader:GLuint
+    fragShader:GLuint
 
-  while not w.windowShouldClose:
-    glfwPollEvents()
-    glClearColor(0.68f, 1f, 0.34f, 1f)
+  # Draw shader
+  shaderProgram = glCreateProgram()
+  glAttachShader(shaderProgram, )
+  
+  glGenBuffers(1, vertexBuff.addr)
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuff)
+  glBufferData(GL_ARRAY_BUFFER, g_vertex_buffer_data.sizeof, g_vertex_buffer_data.addr, GL_STATIC_DRAW)
+  glClearColor(0.0f, 0.0f, 0.4f, 0.0f)
+
+  while not window.windowShouldClose:
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER,vertexBuff)
+    glVertexAttribPointer(cast[GLuint](0), cast[GLint](3), EGL_FLOAT, cast[GLboolean](GL_FALSE), cast[GLsizei](0), cast[pointer] (nil))
+    glDrawArrays(GL_TRIANGLES, 0, 3)
+    glDisableVertexAttribArray(0)
     glClear(GL_COLOR_BUFFER_BIT)
-    w.swapBuffers()
+    window.swapBuffers()
+    glfwPollEvents()
 
-  w.destroyWindow()
+  window.destroyWindow()
   glfwTerminate()
 
 main()
