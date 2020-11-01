@@ -1,11 +1,12 @@
+#version 330 core
 
-#version 300 es
+// Ouput data
+out vec3 color;
 
-precision mediump float;
+void main()
+{
 
-in vec4 color;
-out vec4 fragColor;
+	// Output color = red 
+	color = vec3(100,0,0);
 
-void main() {
-  fragColor = color;
 }

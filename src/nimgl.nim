@@ -13,7 +13,7 @@ proc main() =
   glfwWindowHint(GLFWContextVersionMinor, 3)
   glfwWindowHint(GLFWOpenglForwardCompat, GLFW_TRUE) # Used for Mac
   glfwWindowHint(GLFWOpenglProfile, GLFW_OPENGL_CORE_PROFILE)
-  glfwWindowHint(GLFWResizable, GLFW_FALSE)
+  glfwWindowHint(GLFWResizable, GLFW_TRUE)
 
   let window: GLFWWindow = glfwCreateWindow(1024, 768, "Tutorial 01", nil, nil)
   if window == nil:
@@ -51,7 +51,7 @@ proc main() =
     shaderProgram: GLuint
 
     # Shader src
-    vertShaderSrc = readFile("src/shader.frag")
+    vertShaderSrc = readFile("src/shader.vert")
     fragShaderSrc = readFile("src/shader.frag")
     vertShaderArray = allocCStringArray([vertShaderSrc])
     fragShaderArray = allocCStringArray([fragShaderSrc])
@@ -82,6 +82,41 @@ proc main() =
   glEnableVertexAttribArray(1)
 
   # Compile Shader
+  # vertex
+  vertShader = glCreateShader(GL_VERTEX_SHADER)
+  glShaderSource(vertShader, cast[GLsizei](1), cast[ptr cstring](vertShaderArray), cast[ptr GLint](nil))
+  glCompileShader(vertShader)
+  glGetShaderiv(vertShader, GL_COMPILE_STATUS, isCompiled.addr)
+
+  if isCompiled == 0:
+    echo "Vertex shader wasn't compiled. Reason: "
+
+    # Query the log size
+    var logSize: GLint
+    glGetShaderiv(vertShader, GL_INFO_LOG_LENGTH, logSize.addr)
+
+    # Get the log itself
+    var
+      # logStr = cast[ptr GLchar](alloc(logSize))
+      logStr = cast[ptr GLchar](alloc(logSize))
+      logLen : GLsizei
+
+    glGetShaderInfoLog(vertShader, logSize, logLen.addr, logStr)
+
+    # print log
+    echo "LogStr: ",logStr
+    echo "LogLen: ",logLen
+
+    # Cleanup
+    dealloc(logStr)
+  else:
+    echo "Fragment shader compiled successfully"
+    
+  # Fragment
+  fragShader = glCreateShader(GL_FRAGMENT_SHADER)
+  glShaderSource(fragShader, 1, cast[ptr cstring](fragShaderArray), cast[ptr GLint](nil))
+  glCompileShader(fragShader)
+  glGetShaderiv(fragShader, GL_COMPILE_STATUS, isCompiled.addr)
 
   if isCompiled == 0:
     echo "Fragment shader wasn't compiled. Reason: "
@@ -92,13 +127,15 @@ proc main() =
 
     # Get the log itself
     var
+      # logStr = cast[ptr GLchar](alloc(logSize))
       logStr = cast[ptr GLchar](alloc(logSize))
-      logLen:GLsizei
+      logLen : GLsizei
 
-    glGetShaderInfoLog(fragShader, cast[GLsizei](logSize), logLen.addr, logStr)
+    glGetShaderInfoLog(fragShader, logSize, logLen.addr, logStr)
 
     # print log
-    echo $logStr
+    echo "LogStr: ",logStr
+    echo "LogLen: ",logLen
 
     # Cleanup
     dealloc(logStr)
@@ -130,10 +167,10 @@ proc main() =
       logStr = cast[ptr GLchar](alloc(logSize))
       logLen : GLsizei
     
-    glGetProgramInfoLog(shaderProgram, cast[GLsizei](logSize), logLen.addr, logStr)
+    glGetProgramInfoLog(shaderProgram, logSize, logLen.addr, logStr)
 
     # print the log
-    echo $logStr
+    echo logStr
     # cleanup
     dealloc(logStr)
 

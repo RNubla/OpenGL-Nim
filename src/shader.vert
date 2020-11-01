@@ -1,19 +1,11 @@
-#version 300 es
+#version 330 core
 
-layout(location = 0) in vec3 vertexPos;
-layout(location = 1) in vec3 vertexClr;
-uniform float rotation;
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec3 vertexPosition_modelspace;
 
-out vec4 color;
+void main(){
 
-void main() {
-  mat3 rotateAboutZ= mat3(
-    cos(rotation), -sin(rotation), 0,
-    sin(rotation), cos(rotation), 0,
-    0, 0, 1
-  );
+    gl_Position.xyz = vertexPosition_modelspace;
+    gl_Position.w = 1.0;
 
-  // Rotate clockwise
-  gl_Position =  vec4(vertexPos * inverse(rotateAboutZ), 1);
-  color = vec4(vertexClr, 1);
 }
